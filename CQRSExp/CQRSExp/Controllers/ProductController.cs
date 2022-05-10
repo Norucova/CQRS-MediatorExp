@@ -22,7 +22,7 @@ namespace CQRSExp.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> Get(int id)
         {
             var query = new GetProductByIdQuery() { Id = id };
             return Ok(await _mediator.Send(query));

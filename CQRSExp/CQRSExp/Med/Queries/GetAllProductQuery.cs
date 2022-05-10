@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using CQRSExp.DAL;
+using CQRSExp.Entities;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,23 +10,20 @@ using System.Threading.Tasks;
 
 namespace CQRSExp.Med.Queries
 {
-    public class GetAllProductQuery:IRequest<List<GetProductViewModel>>
+    public class GetAllProductQuery:IRequest<List<ProductEntity>>
     {
-        public class GetAllProductQueryHandler : IRequestHandler<GetAllProductQuery, List<GetProductViewModel>>
+        public class GetAllProductQueryHandler : IRequestHandler<GetAllProductQuery, List<ProductEntity>>
         {
-            public Task<List<GetProductViewModel>> Handle(GetAllProductQuery request, CancellationToken cancellationToken)
+            private readonly AppDbContext _context;
+
+            public GetAllProductQueryHandler(AppDbContext context)
             {
-                var model = new GetProductViewModel()
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Book"
-                };
-                var model2 = new GetProductViewModel()
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Flower"
-                };
-                return Task.FromResult(new List<GetProductViewModel>() { model, model2 });
+                _context = context;
+            }
+            public async Task<List<ProductEntity>> Handle(GetAllProductQuery request, CancellationToken cancellationToken)
+            {
+                List<ProductEntity> product = await _context.Products.Where(x => x.IsDeleted == false).ToListAsync();
+                return product;
             }
         }
     }
